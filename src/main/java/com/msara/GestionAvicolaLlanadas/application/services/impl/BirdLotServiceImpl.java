@@ -1,6 +1,6 @@
 package com.msara.GestionAvicolaLlanadas.application.services.impl;
 
-import com.msara.GestionAvicolaLlanadas.adapters.dto.request.ClosingLotRequest;
+import com.msara.GestionAvicolaLlanadas.adapters.dto.request.StatusLotRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.request.RegisterBirdLotRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.response.GeneralResponse;
 import com.msara.GestionAvicolaLlanadas.application.services.BirdLotService;
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @Transactional
@@ -40,7 +40,7 @@ public class BirdLotServiceImpl implements BirdLotService {
     }
 
     @Override
-    public GeneralResponse closeBirdLot(Long id, ClosingLotRequest request) {
+    public GeneralResponse closeBirdLot(Long id, StatusLotRequest request) {
         BirdLotEntity birdLot = birdLotRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Bird Lot not found"));
 
@@ -49,6 +49,18 @@ public class BirdLotServiceImpl implements BirdLotService {
         birdLotRepository.save(birdLot);
 
         return new GeneralResponse("00", "Bird lot closed", true);
+    }
+
+    @Override
+    public List<BirdLotEntity> reportBirdLots(StatusLotRequest request) {
+        List<BirdLotEntity> birdLots;
+        if (request.status() == 0 || request.status() == 1) {
+            birdLots = birdLotRepository.findAllByStatus(request.status());
+        } else {
+            birdLots = birdLotRepository.findAll();
+        }
+
+        return birdLots;
     }
 
 

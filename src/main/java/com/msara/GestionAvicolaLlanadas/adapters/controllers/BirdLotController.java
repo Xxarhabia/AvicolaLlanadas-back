@@ -1,6 +1,6 @@
 package com.msara.GestionAvicolaLlanadas.adapters.controllers;
 
-import com.msara.GestionAvicolaLlanadas.adapters.dto.request.ClosingLotRequest;
+import com.msara.GestionAvicolaLlanadas.adapters.dto.request.StatusLotRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.request.RegisterBirdLotRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.response.GeneralResponse;
 import com.msara.GestionAvicolaLlanadas.application.services.impl.BirdLotServiceImpl;
@@ -26,7 +26,12 @@ public class BirdLotController {
     }
 
     @PutMapping("/closing/{id}")
-    public ResponseEntity<GeneralResponse> closeBirdLot(@PathVariable Long id, @RequestBody ClosingLotRequest request) {
+    public ResponseEntity<GeneralResponse> closeBirdLot(@PathVariable Long id, @RequestBody StatusLotRequest request) {
         return new ResponseEntity<>(birdLotService.closeBirdLot(id, request), HttpStatus.OK);
+    }
+
+    @GetMapping("/report")
+    public ResponseEntity<?> birtBatchReport(@RequestBody StatusLotRequest request) {
+        return new ResponseEntity<>(birdLotService.reportBirdLots(request), HttpStatus.OK);
     }
 }
