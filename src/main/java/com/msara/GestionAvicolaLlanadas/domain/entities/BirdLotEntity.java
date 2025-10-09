@@ -25,6 +25,9 @@ public class BirdLotEntity {
     @Column(nullable = false, name = "date_entry")
     private Date dateEntry;
 
+    @Column(nullable = true, name = "closing_date")
+    private Date closingDate;
+
     @Column(nullable = false, name = "bird_type", length = 50)
     @JsonProperty("bird_type")
     private String birdType;

@@ -1,7 +1,8 @@
 package com.msara.GestionAvicolaLlanadas.application.services.impl;
 
+import com.msara.GestionAvicolaLlanadas.adapters.dto.request.ClosingLotRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.request.RegisterBirdLotRequest;
-import com.msara.GestionAvicolaLlanadas.adapters.dto.response.RegisterBirdLotReponse;
+import com.msara.GestionAvicolaLlanadas.adapters.dto.response.GeneralResponse;
 import com.msara.GestionAvicolaLlanadas.application.services.BirdLotService;
 import com.msara.GestionAvicolaLlanadas.domain.entities.BirdLotEntity;
 import com.msara.GestionAvicolaLlanadas.domain.repositories.BirdLotRepository;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -23,7 +25,7 @@ public class BirdLotServiceImpl implements BirdLotService {
     }
 
     @Override
-    public RegisterBirdLotReponse registerBirdLot(RegisterBirdLotRequest registerBirdLotRequest) {
+    public GeneralResponse registerBirdLot(RegisterBirdLotRequest registerBirdLotRequest) {
         BirdLotEntity birdLot = BirdLotEntity.builder()
                 .dateEntry(new Date())
                 .birdType(registerBirdLotRequest.birdType())
@@ -34,6 +36,20 @@ public class BirdLotServiceImpl implements BirdLotService {
                 .status(registerBirdLotRequest.status())
                 .build();
         birdLotRepository.save(birdLot);
-        return new RegisterBirdLotReponse("00", "Bird register successful", true);
+        return new GeneralResponse("00", "Bird register successful", true);
     }
+
+    @Override
+    public GeneralResponse closeBirdLot(Long id, ClosingLotRequest request) {
+        BirdLotEntity birdLot = birdLotRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Bird Lot not found"));
+
+        birdLot.setStatus(request.status());
+        birdLot.setClosingDate(new Date());
+        birdLotRepository.save(birdLot);
+
+        return new GeneralResponse("00", "Bird lot closed", true);
+    }
+
+
 }
