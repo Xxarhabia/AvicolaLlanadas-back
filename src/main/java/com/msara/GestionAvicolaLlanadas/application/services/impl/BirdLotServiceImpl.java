@@ -47,7 +47,6 @@ public class BirdLotServiceImpl implements BirdLotService {
         birdLot.setStatus(request.status());
         birdLot.setClosingDate(new Date());
         birdLotRepository.save(birdLot);
-
         return new GeneralResponse("00", "Bird lot closed", true);
     }
 
@@ -59,7 +58,6 @@ public class BirdLotServiceImpl implements BirdLotService {
         } else {
             birdLots = birdLotRepository.findAll();
         }
-
         return birdLots;
     }
 

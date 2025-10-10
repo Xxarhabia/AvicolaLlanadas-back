@@ -15,4 +15,5 @@ public interface BirdLotService {
 
     List<BirdLotEntity> reportBirdLots(StatusLotRequest request);
 
+
 }
