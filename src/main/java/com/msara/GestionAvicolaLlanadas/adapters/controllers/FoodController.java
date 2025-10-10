@@ -1,5 +1,6 @@
 package com.msara.GestionAvicolaLlanadas.adapters.controllers;
 
+import com.msara.GestionAvicolaLlanadas.adapters.dto.request.FoodConsumptionRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.request.RecordTypeFoodRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.response.GeneralResponse;
 import com.msara.GestionAvicolaLlanadas.application.services.impl.FoodServiceImpl;
@@ -25,5 +26,10 @@ public class FoodController {
     @PostMapping("/record")
     public ResponseEntity<GeneralResponse> recordTypeFood(@RequestBody RecordTypeFoodRequest request) {
         return new ResponseEntity<>(foodService.recordTypeFood(request), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/consumption")
+    public ResponseEntity<GeneralResponse> recordFoodConsumption(@RequestBody FoodConsumptionRequest request) {
+        return new ResponseEntity<>(foodService.recordFoodConsumption(request), HttpStatus.OK);
     }
 }

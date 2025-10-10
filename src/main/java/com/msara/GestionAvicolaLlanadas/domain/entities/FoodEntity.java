@@ -19,6 +19,7 @@ public class FoodEntity {
     @Column(name = "food_id")
     private Long foodId;
 
+    @Column(unique = true, nullable = false)
     private String name;
 
     private String type;

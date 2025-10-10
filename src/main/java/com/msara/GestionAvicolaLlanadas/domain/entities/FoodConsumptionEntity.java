@@ -14,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FoodConsumption {
+public class FoodConsumptionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
