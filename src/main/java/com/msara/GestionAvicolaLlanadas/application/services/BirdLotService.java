@@ -1,6 +1,6 @@
 package com.msara.GestionAvicolaLlanadas.application.services;
 
-import com.msara.GestionAvicolaLlanadas.adapters.dto.request.StatusLotRequest;
+import com.msara.GestionAvicolaLlanadas.adapters.dto.request.CloseLotRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.request.RegisterBirdLotRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.response.GeneralResponse;
 import com.msara.GestionAvicolaLlanadas.domain.entities.BirdLotEntity;
@@ -11,9 +11,9 @@ public interface BirdLotService {
 
     GeneralResponse registerBirdLot(RegisterBirdLotRequest birdLot);
 
-    GeneralResponse closeBirdLot(Long id, StatusLotRequest request);
+    GeneralResponse closeBirdLot(Long id, CloseLotRequest request);
 
-    List<BirdLotEntity> reportBirdLots(StatusLotRequest request);
+    List<BirdLotEntity> reportBirdLots();
 
 
 }

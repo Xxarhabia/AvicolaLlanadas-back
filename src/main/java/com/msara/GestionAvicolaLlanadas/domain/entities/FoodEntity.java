@@ -1,10 +1,13 @@
 package com.msara.GestionAvicolaLlanadas.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -20,8 +23,6 @@ public class FoodEntity {
     private Long foodId;
 
     @Column(unique = true, nullable = false)
-    private String name;
-
     private String type;
 
     @Column(nullable = false, name = "available_quantity")
@@ -29,4 +30,8 @@ public class FoodEntity {
 
     @Column(nullable = false, name = "unit_measurement")
     private String unitMeasurement; //Unidad medida
+
+    @Column(name = "date_insert")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateInsert;
 }

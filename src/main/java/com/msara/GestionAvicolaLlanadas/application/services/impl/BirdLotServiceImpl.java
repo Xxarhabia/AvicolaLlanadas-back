@@ -1,6 +1,6 @@
 package com.msara.GestionAvicolaLlanadas.application.services.impl;
 
-import com.msara.GestionAvicolaLlanadas.adapters.dto.request.StatusLotRequest;
+import com.msara.GestionAvicolaLlanadas.adapters.dto.request.CloseLotRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.request.RegisterBirdLotRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.response.GeneralResponse;
 import com.msara.GestionAvicolaLlanadas.application.services.BirdLotService;
@@ -10,7 +10,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -26,39 +25,39 @@ public class BirdLotServiceImpl implements BirdLotService {
 
     @Override
     public GeneralResponse registerBirdLot(RegisterBirdLotRequest registerBirdLotRequest) {
+        int status = 0;
+        if(registerBirdLotRequest.status().equalsIgnoreCase("active")){
+            status = 1;
+        }
         BirdLotEntity birdLot = BirdLotEntity.builder()
-                .dateEntry(new Date())
+                .dateEntry(registerBirdLotRequest.startDate())
                 .birdType(registerBirdLotRequest.birdType())
-                .month(registerBirdLotRequest.month())
-                .recordedAmount(registerBirdLotRequest.recordedAmount())
                 .initialQuantity(registerBirdLotRequest.initialQuantity())
                 .currentQuantity(registerBirdLotRequest.currentQuantity())
-                .status(registerBirdLotRequest.status())
+                .status(status)
                 .build();
         birdLotRepository.save(birdLot);
-        return new GeneralResponse("00", "Bird register successful", true);
+        return new GeneralResponse("00", "Bird register successful", true, birdLot);
     }
 
     @Override
-    public GeneralResponse closeBirdLot(Long id, StatusLotRequest request) {
+    public GeneralResponse closeBirdLot(Long id, CloseLotRequest request) {
         BirdLotEntity birdLot = birdLotRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Bird Lot not found"));
+        int status = 1;
+        if (request.status().equalsIgnoreCase("closed")) {
+            status = 0;
+        }
 
-        birdLot.setStatus(request.status());
-        birdLot.setClosingDate(new Date());
+        birdLot.setStatus(status);
+        birdLot.setClosingDate(request.closeDate());
         birdLotRepository.save(birdLot);
-        return new GeneralResponse("00", "Bird lot closed", true);
+        return new GeneralResponse("00", "Bird lot closed", true, birdLot);
     }
 
     @Override
-    public List<BirdLotEntity> reportBirdLots(StatusLotRequest request) {
-        List<BirdLotEntity> birdLots;
-        if (request.status() == 0 || request.status() == 1) {
-            birdLots = birdLotRepository.findAllByStatus(request.status());
-        } else {
-            birdLots = birdLotRepository.findAll();
-        }
-        return birdLots;
+    public List<BirdLotEntity> reportBirdLots() {
+        return birdLotRepository.findAll();
     }
 
 

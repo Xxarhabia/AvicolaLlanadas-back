@@ -40,12 +40,12 @@ public class FoodServiceImpl implements FoodService {
     public GeneralResponse recordTypeFood(RecordTypeFoodRequest request) {
         FoodEntity food = FoodEntity.builder()
                 .availableQuantity(request.availableQuantity())
-                .name(request.name().toUpperCase())
-                .type(request.type().toLowerCase())
-                .unitMeasurement(request.unitMeasurement().toUpperCase())
+                .type(request.foodType().toLowerCase())
+                .unitMeasurement(request.unit().toUpperCase())
+                .dateInsert(request.dateInsert())
                 .build();
         foodRepository.save(food);
-        return new GeneralResponse("00", "The food was successfully registered", true);
+        return new GeneralResponse("00", "The food was successfully registered", true, food);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class FoodServiceImpl implements FoodService {
                 .build();
         usedFoodRepository.save(usedFood);
 
-        return new GeneralResponse("00", "The food consumed was successfully registered", true);
+        return new GeneralResponse("00", "The food consumed was successfully registered", true, usedFood);
     }
 
 

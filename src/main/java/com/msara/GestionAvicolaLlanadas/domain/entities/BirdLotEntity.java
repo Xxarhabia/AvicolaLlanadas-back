@@ -1,5 +1,6 @@
 package com.msara.GestionAvicolaLlanadas.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -23,21 +24,16 @@ public class BirdLotEntity {
     private Long lotId;
 
     @Column(nullable = false, name = "date_entry")
-    private Date dateEntry;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateEntry;
 
     @Column(nullable = true, name = "closing_date")
-    private Date closingDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate closingDate;
 
     @Column(nullable = false, name = "bird_type", length = 50)
     @JsonProperty("bird_type")
     private String birdType;
-
-    @Column(nullable = false)
-    private String month;
-
-    @Column(nullable = false, name = "recorded_amount")
-    @JsonProperty("recorded_amount")
-    private int recordedAmount;
 
     @Column(nullable = false, name = "initial_quanitity")
     @JsonProperty("initial_quantity")
