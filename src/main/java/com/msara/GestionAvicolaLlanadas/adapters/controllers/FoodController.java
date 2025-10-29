@@ -30,4 +30,9 @@ public class FoodController {
     public ResponseEntity<GeneralResponse> recordFoodConsumption(@RequestBody FoodConsumptionRequest request) {
         return new ResponseEntity<>(foodService.recordFoodConsumption(request), HttpStatus.OK);
     }
+
+    @GetMapping("/report")
+    public ResponseEntity<?> foodRecordedReport() {
+        return new ResponseEntity<>(foodService.reportFoodRecorded(), HttpStatus.OK);
+    }
 }

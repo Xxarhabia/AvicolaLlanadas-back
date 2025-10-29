@@ -4,6 +4,7 @@ import com.msara.GestionAvicolaLlanadas.adapters.dto.request.FoodConsumptionRequ
 import com.msara.GestionAvicolaLlanadas.adapters.dto.request.RecordTypeFoodRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.response.GeneralResponse;
 import com.msara.GestionAvicolaLlanadas.application.services.FoodService;
+import com.msara.GestionAvicolaLlanadas.application.utils.FoodUtils;
 import com.msara.GestionAvicolaLlanadas.domain.entities.BirdLotEntity;
 import com.msara.GestionAvicolaLlanadas.domain.entities.FoodConsumptionEntity;
 import com.msara.GestionAvicolaLlanadas.domain.entities.FoodEntity;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Transactional
@@ -38,14 +40,35 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     public GeneralResponse recordTypeFood(RecordTypeFoodRequest request) {
-        FoodEntity food = FoodEntity.builder()
-                .availableQuantity(request.availableQuantity())
-                .type(request.foodType().toLowerCase())
-                .unitMeasurement(request.unit().toUpperCase())
-                .dateInsert(request.dateInsert())
-                .build();
-        foodRepository.save(food);
-        return new GeneralResponse("00", "The food was successfully registered", true, food);
+        double foodQuantityConvert;
+        FoodUtils utils = new FoodUtils();
+        FoodEntity foundFood = foodRepository.findOneByType(request.foodType().toLowerCase());
+        if (foundFood != null) {
+            foodQuantityConvert = utils.convertUnitToKg(request);
+            if (foodQuantityConvert == -1) {
+                return new GeneralResponse("01", "Unidad de medida incorrecta", false, null);
+            }
+
+            double newFoodQuantityKG = foundFood.getAvailableQuantity() + foodQuantityConvert;
+            foundFood.setAvailableQuantity(newFoodQuantityKG);
+            foundFood.setDateInsert(request.dateInsert());
+            foodRepository.save(foundFood);
+            return new GeneralResponse("00", "The food was successfully registered", true, foundFood);
+        } else {
+            foodQuantityConvert = utils.convertUnitToKg(request);
+            if (foodQuantityConvert == -1) {
+                return new GeneralResponse("01", "Unidad de medida incorrecta", false, null);
+            }
+
+            FoodEntity food = FoodEntity.builder()
+                    .availableQuantity(foodQuantityConvert)
+                    .type(request.foodType().toLowerCase())
+                    .unitMeasurement("KG")
+                    .dateInsert(request.dateInsert())
+                    .build();
+            foodRepository.save(food);
+            return new GeneralResponse("00", "The food was successfully registered", true, food);
+        }
     }
 
     @Override
@@ -81,6 +104,11 @@ public class FoodServiceImpl implements FoodService {
         usedFoodRepository.save(usedFood);
 
         return new GeneralResponse("00", "The food consumed was successfully registered", true, usedFood);
+    }
+
+    @Override
+    public List<FoodEntity> reportFoodRecorded() {
+        return foodRepository.findAll();
     }
 
 
