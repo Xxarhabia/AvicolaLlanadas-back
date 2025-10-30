@@ -4,15 +4,15 @@ import com.msara.GestionAvicolaLlanadas.adapters.dto.request.RecordTypeFoodReque
 
 public class FoodUtils {
 
-    public double convertUnitToKg(RecordTypeFoodRequest request) {
+    public double convertUnitToKg(double availableQuantity, String unit) {
         double foodQuantityConvert;
-        if (request.unit().equalsIgnoreCase("KG")) {
-            return request.availableQuantity();
-        } else if (request.unit().equalsIgnoreCase("LBS")) {
-            foodQuantityConvert = request.availableQuantity() * 0.453592;
+        if (unit.equalsIgnoreCase("KG")) {
+            return availableQuantity;
+        } else if (unit.equalsIgnoreCase("LBS")) {
+            foodQuantityConvert = availableQuantity * 0.453592;
             return Math.round(foodQuantityConvert * 100) / 100.0;
-        } else if (request.unit().equalsIgnoreCase("G")) {
-            foodQuantityConvert = request.availableQuantity() * 0.001;
+        } else if (unit.equalsIgnoreCase("G")) {
+            foodQuantityConvert = availableQuantity * 0.001;
             return Math.round(foodQuantityConvert * 100) / 100.0;
         }
         return -1;

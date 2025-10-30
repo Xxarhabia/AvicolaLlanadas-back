@@ -35,4 +35,9 @@ public class FoodController {
     public ResponseEntity<?> foodRecordedReport() {
         return new ResponseEntity<>(foodService.reportFoodRecorded(), HttpStatus.OK);
     }
+
+    @GetMapping("/report-consumption")
+    public ResponseEntity<?> foodConsumptionReport() {
+        return new ResponseEntity<>(foodService.reportFoodConsumption(), HttpStatus.OK);
+    }
 }

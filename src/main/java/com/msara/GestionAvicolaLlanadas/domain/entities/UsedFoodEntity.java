@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -28,7 +29,7 @@ public class UsedFoodEntity {
     private int usedInBird;
 
     @Column(name = "date_use")
-    private Date dateUse;
+    private LocalDate dateUse;
 
     @ManyToOne
     @JoinColumn(name = "food_id", referencedColumnName = "food_id")

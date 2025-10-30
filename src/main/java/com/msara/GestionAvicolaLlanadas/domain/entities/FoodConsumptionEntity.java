@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -21,10 +22,12 @@ public class FoodConsumptionEntity {
     private Long id;
 
     @Column(nullable = false)
-    private Date date;
+    private LocalDate date;
 
     @Column(nullable = false, name = "quantity_used")
     private Double quantityUsed;
+
+    private String unit;
 
     @ManyToOne
     @JoinColumn(
