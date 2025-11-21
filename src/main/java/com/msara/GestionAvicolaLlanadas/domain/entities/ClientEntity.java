@@ -27,5 +27,7 @@ public class ClientEntity {
 
     @Column(nullable = false, unique = true, length = 10)
     private String phone;
-    private String type;
+
+    @Column(nullable = false, unique = true, length = 10)
+    private String document;
 }
