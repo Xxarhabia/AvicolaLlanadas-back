@@ -22,7 +22,7 @@ public class ClientEntity {
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @Column(unique = true, length = 100)
+    @Column(length = 100)
     private String address;
 
     @Column(nullable = false, unique = true, length = 10)

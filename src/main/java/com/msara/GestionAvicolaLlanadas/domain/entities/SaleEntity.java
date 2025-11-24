@@ -30,4 +30,11 @@ public class SaleEntity {
             referencedColumnName = "client_id"
     )
     private ClientEntity client;
+
+    @ManyToOne
+    @JoinColumn(
+            name = "sale_detail_id",
+            referencedColumnName = "detail_id"
+    )
+    private SalesDetailEntity salesDetail;
 }

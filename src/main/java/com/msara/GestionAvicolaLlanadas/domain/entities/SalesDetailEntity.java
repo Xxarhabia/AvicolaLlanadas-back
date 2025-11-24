@@ -21,15 +21,11 @@ public class SalesDetailEntity {
 
     @Column(name = "product_name")
     private String productName;
-    private int quantity;
+    private double quantity;
 
     @Column(name = "unit_price")
     private double unitPrice;
 
-    @ManyToOne
-    @JoinColumn(
-            name = "sale_id",
-            referencedColumnName = "sale_id"
-    )
-    private SaleEntity sale;
+    @Column(name = "type_sale")
+    private String typeSale;
 }
