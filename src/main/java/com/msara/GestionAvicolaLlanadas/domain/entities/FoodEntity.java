@@ -1,19 +1,15 @@
 package com.msara.GestionAvicolaLlanadas.domain.entities;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "food", schema = "avicola_schema")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "food")
+@AllArgsConstructor
 @Builder
 public class FoodEntity {
 
@@ -22,16 +18,33 @@ public class FoodEntity {
     @Column(name = "food_id")
     private Long foodId;
 
-    @Column(unique = true, nullable = false)
-    private String type;
+    // FIX: era "type" sin mapeo explícito; ahora type_food con UNIQUE
+    @Column(name = "type_food", nullable = false, unique = true, length = 50)
+    private String typeFood;
 
-    @Column(nullable = false, name = "available_quantity")
-    private Double availableQuantity;
+    @Column(name = "available_quantity", nullable = false, precision = 12, scale = 2)
+    @Builder.Default
+    private BigDecimal availableQuantity = BigDecimal.ZERO;
 
-    @Column(nullable = false, name = "unit_measurement")
-    private String unitMeasurement; //Unidad medida
+    @Column(name = "unit_measurement", nullable = false, length = 10)
+    private String unitMeasurement;
 
-    @Column(name = "date_insert")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateInsert;
+    // NUEVO: precio unitario de venta
+    @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal unitPrice = BigDecimal.ZERO;
+
+    // NUEVO: stock mínimo para alertas automáticas
+    @Column(name = "min_stock", nullable = false, precision = 12, scale = 2)
+    @Builder.Default
+    private BigDecimal minStock = BigDecimal.ZERO;
+
+    // NUEVO: indica si el alimento también se vende al público
+    @Column(name = "is_for_sale", nullable = false)
+    @Builder.Default
+    private Boolean isForSale = false;
+
+    @Column(name = "date_insert", nullable = false)
+    @Builder.Default
+    private LocalDate dateInsert = LocalDate.now();
 }

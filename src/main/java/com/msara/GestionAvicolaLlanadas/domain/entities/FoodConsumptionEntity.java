@@ -1,19 +1,15 @@
 package com.msara.GestionAvicolaLlanadas.domain.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
-@Table(name = "food_consumption")
+@Table(name = "food_consumption", schema = "avicola_schema")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class FoodConsumptionEntity {
 
@@ -21,25 +17,25 @@ public class FoodConsumptionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private LocalDate date;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "food_id", referencedColumnName = "food_id", nullable = false)
+    private FoodEntity food;
 
-    @Column(nullable = false, name = "quantity_used")
-    private Double quantityUsed;
-
-    private String unit;
-
-    @ManyToOne
-    @JoinColumn(
-            name = "bird_lot_id",
-            referencedColumnName = "lot_id"
-    )
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bird_lot_id", referencedColumnName = "lot_id", nullable = false)
     private BirdLotEntity birdLot;
 
-    @ManyToOne
-    @JoinColumn(
-            name = "food_id",
-            referencedColumnName = "food_id"
-    )
-    private FoodEntity food;
+    @Column(name = "quantity_used", nullable = false, precision = 12, scale = 2)
+    private BigDecimal quantityUsed;
+
+    @Column(nullable = false, length = 10)
+    private String unit;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private LocalDate date = LocalDate.now();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "registered_by", referencedColumnName = "user_id")
+    private UserEntity registeredBy;
 }

@@ -1,18 +1,14 @@
 package com.msara.GestionAvicolaLlanadas.domain.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.Date;
+import lombok.*;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "eggs_production")
+@Table(name = "eggs_production", schema = "avicola_schema")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class EggsProductionEntity {
 
@@ -21,16 +17,24 @@ public class EggsProductionEntity {
     @Column(name = "eggs_prod_id")
     private Long eggsProductionId;
 
-    @Column(nullable = false)
-    private Date date;
+    // FIX: FK apuntaba a "birt_lot_id" (typo)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bird_lot_id", referencedColumnName = "lot_id", nullable = false)
+    private BirdLotEntity birdLot;
 
     @Column(name = "total_quantity", nullable = false)
-    private int totalQuantity;
+    private Integer totalQuantity;
 
-    @ManyToOne
-    @JoinColumn(
-            name = "birt_lot_id",
-            referencedColumnName = "lot_id"
-    )
-    private BirdLotEntity birdLot;
+    // NUEVO: huevos rotos o defectuosos
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer cracked = 0;
+
+    // FIX: era Date, ahora LocalDate
+    @Column(nullable = false)
+    @Builder.Default
+    private LocalDate date = LocalDate.now();
+
+    @Column(columnDefinition = "TEXT")
+    private String notes;
 }

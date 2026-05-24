@@ -6,5 +6,8 @@ import com.msara.GestionAvicolaLlanadas.adapters.dto.response.GeneralResponse;
 public interface ClientService {
 
     GeneralResponse recordClient(RecordClientRequest request);
+
     GeneralResponse getClients();
+
+    GeneralResponse getClientById(Long id);
 }

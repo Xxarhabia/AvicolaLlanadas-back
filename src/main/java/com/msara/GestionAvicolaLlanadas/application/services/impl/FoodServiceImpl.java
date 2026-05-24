@@ -2,126 +2,114 @@ package com.msara.GestionAvicolaLlanadas.application.services.impl;
 
 import com.msara.GestionAvicolaLlanadas.adapters.dto.request.FoodConsumptionRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.request.RecordTypeFoodRequest;
+import com.msara.GestionAvicolaLlanadas.adapters.dto.response.FoodConsumptionResponse;
+import com.msara.GestionAvicolaLlanadas.adapters.dto.response.FoodResponse;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.response.GeneralResponse;
+import com.msara.GestionAvicolaLlanadas.application.exceptions.BusinessException;
 import com.msara.GestionAvicolaLlanadas.application.services.FoodService;
-import com.msara.GestionAvicolaLlanadas.application.utils.FoodUtils;
 import com.msara.GestionAvicolaLlanadas.domain.entities.BirdLotEntity;
 import com.msara.GestionAvicolaLlanadas.domain.entities.FoodConsumptionEntity;
 import com.msara.GestionAvicolaLlanadas.domain.entities.FoodEntity;
-import com.msara.GestionAvicolaLlanadas.domain.entities.UsedFoodEntity;
 import com.msara.GestionAvicolaLlanadas.domain.repositories.BirdLotRepository;
 import com.msara.GestionAvicolaLlanadas.domain.repositories.FoodConsumptionRepository;
 import com.msara.GestionAvicolaLlanadas.domain.repositories.FoodRepository;
-import com.msara.GestionAvicolaLlanadas.domain.repositories.UsedFoodRepository;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class FoodServiceImpl implements FoodService {
 
-    private FoodRepository foodRepository;
-    private FoodConsumptionRepository foodConsumptionRepository;
-    private BirdLotRepository birdLotRepository;
-    private UsedFoodRepository usedFoodRepository;
-
-    @Autowired
-    public FoodServiceImpl(FoodRepository foodRepository,BirdLotRepository lotRepository,
-                           FoodConsumptionRepository foodConsumptionRepository, UsedFoodRepository usedFoodRepository) {
-        this.foodRepository = foodRepository;
-        this.foodConsumptionRepository = foodConsumptionRepository;
-        this.birdLotRepository = lotRepository;
-        this.usedFoodRepository = usedFoodRepository;
-    }
+    private final FoodRepository foodRepository;
+    private final FoodConsumptionRepository foodConsumptionRepository;
+    private final BirdLotRepository birdLotRepository;
 
     @Override
     public GeneralResponse recordTypeFood(RecordTypeFoodRequest request) {
-        double foodQuantityConvert;
-        FoodUtils utils = new FoodUtils();
-        FoodEntity foundFood = foodRepository.findOneByType(request.foodType().toLowerCase());
-        if (foundFood != null) {
-            foodQuantityConvert = utils.convertUnitToKg(request.availableQuantity(), request.unit());
-            if (foodQuantityConvert == -1) {
-                return new GeneralResponse("01", "Unidad de medida incorrecta", false, null);
-            }
+        FoodEntity food = FoodEntity.builder()
+                .typeFood(request.typeFood().toLowerCase().trim())
+                .availableQuantity(request.availableQuantity())
+                .unitMeasurement(request.unitMeasurement().toLowerCase())
+                .unitPrice(request.unitPrice())
+                .minStock(request.minStock())
+                .isForSale(request.isForSale() != null && request.isForSale())
+                .dateInsert(request.dateInsert() != null ? request.dateInsert() : LocalDate.now())
+                .build();
 
-            double newFoodQuantityKG = foundFood.getAvailableQuantity() + foodQuantityConvert;
-            foundFood.setAvailableQuantity(newFoodQuantityKG);
-            foundFood.setDateInsert(request.dateInsert());
-            foodRepository.save(foundFood);
-            return new GeneralResponse("00", "The food was successfully registered", true, foundFood);
-        } else {
-            foodQuantityConvert = utils.convertUnitToKg(request.availableQuantity(), request.unit());
-            if (foodQuantityConvert == -1) {
-                return new GeneralResponse("01", "Unidad de medida incorrecta", false, null);
-            }
+        foodRepository.save(food);
 
-            FoodEntity food = FoodEntity.builder()
-                    .availableQuantity(foodQuantityConvert)
-                    .type(request.foodType().toLowerCase())
-                    .unitMeasurement("KG")
-                    .dateInsert(request.dateInsert())
-                    .build();
-            foodRepository.save(food);
-            return new GeneralResponse("00", "The food was successfully registered", true, food);
-        }
+        FoodEntity actual = foodRepository.findByTypeFoodIgnoreCase(request.typeFood()).orElse(food);
+        return new GeneralResponse("00", "Alimento registrado correctamente", true, toResponse(actual));
     }
 
     @Override
     public GeneralResponse recordFoodConsumption(FoodConsumptionRequest request) {
-        double foodQuantityConvert;
-        FoodUtils utils = new FoodUtils();
-        BirdLotEntity birdLot = birdLotRepository.findById(request.birdLotId()).orElseThrow(
-                () -> new RuntimeException("Bird Lot not found"));
-        FoodEntity food = foodRepository.findOneByType(request.typeFood().toLowerCase());
+        BirdLotEntity lot = birdLotRepository.findById(request.birdLotId())
+                .orElseThrow(() -> new EntityNotFoundException("Lote #" + request.birdLotId() + " no encontrado"));
 
-        // guardamos la comida consumida por las aves
-        FoodConsumptionEntity foodConsumption = FoodConsumptionEntity.builder()
-                .date(request.dateInsert())
+        if (!lot.getStatus().equals("ACTIVO")) {
+            throw new BusinessException("LOTE_INACTIVO",
+                    "El lote #" + request.birdLotId() + " está " + lot.getStatus() + " y no puede recibir alimento");
+        }
+
+        FoodEntity food = foodRepository.findById(request.foodId())
+                .orElseThrow(() -> new EntityNotFoundException("Lote #" + request.foodId() + " no encontrado"));
+
+        FoodConsumptionEntity consumption = FoodConsumptionEntity.builder()
+                .food(food)
+                .birdLot(lot)
                 .quantityUsed(request.quantityUsed())
                 .unit(request.unit())
-                .food(food)
-                .birdLot(birdLot)
+                .date(request.date() != null ? request.date() : LocalDate.now())
                 .build();
-        foodConsumptionRepository.save(foodConsumption);
 
-        // Actualizamos la cantidad de alimento disponible
-        foodQuantityConvert = utils.convertUnitToKg(request.quantityUsed(), request.unit());
-        if (foodQuantityConvert == -1) {
-            return new GeneralResponse("01", "Unidad de medida incorrecta", false, null);
-        }
-        if (foodQuantityConvert > food.getAvailableQuantity()) {
-            return new GeneralResponse("01", "La cantidad solicitada exede la cantidad existente", false, null);
-        }
-        double newAvailableQuantity = food.getAvailableQuantity() - foodQuantityConvert;
-        food.setAvailableQuantity(newAvailableQuantity);
-        foodRepository.save(food);
+        foodConsumptionRepository.save(consumption);
 
-        // guardamos en que fue usado la comida
-        UsedFoodEntity usedFood = UsedFoodEntity.builder()
-                .soldToClient(0)
-                .usedInBird(1)
-                .dateUse(request.dateInsert())
-                .food(food)
-                .build();
-        usedFoodRepository.save(usedFood);
-
-        return new GeneralResponse("00", "The food consumed was successfully registered", true, foodConsumption);
+        return new GeneralResponse("00", "Consumo registrado correctamente", true,
+                toConsumptionResponse(consumption));
     }
 
     @Override
-    public List<FoodEntity> reportFoodRecorded() {
-        return foodRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<FoodResponse> reportFoodRecorded() {
+        return foodRepository.findAll().stream().map(this::toResponse).toList();
     }
 
     @Override
-    public List<FoodConsumptionEntity> reportFoodConsumption() {
-        return foodConsumptionRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<FoodConsumptionResponse> reportFoodConsumption() {
+        return foodConsumptionRepository.findAll().stream()
+                .map(this::toConsumptionResponse).toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<FoodConsumptionResponse> reportFoodConsumptionByLot(Long lotId) {
+        return foodConsumptionRepository.findByBirdLotLotId(lotId).stream()
+                .map(this::toConsumptionResponse).toList();
+    }
 
+    private FoodResponse toResponse(FoodEntity e) {
+        return new FoodResponse(
+                e.getFoodId(), e.getTypeFood(), e.getAvailableQuantity(),
+                e.getUnitMeasurement(), e.getUnitPrice(), e.getMinStock(),
+                e.getIsForSale(), e.getDateInsert(),
+                e.getAvailableQuantity().compareTo(e.getMinStock()) <= 0
+        );
+    }
+
+    private FoodConsumptionResponse toConsumptionResponse(FoodConsumptionEntity e) {
+        return new FoodConsumptionResponse(
+                e.getId(),
+                e.getFood().getFoodId(), e.getFood().getTypeFood(),
+                e.getBirdLot().getLotId(), e.getBirdLot().getBirdType(),
+                e.getQuantityUsed(), e.getUnit(), e.getDate()
+        );
+    }
 }

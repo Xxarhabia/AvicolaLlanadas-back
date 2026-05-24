@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -19,21 +20,30 @@ public class MortalityEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mortality_id")
-    private long mortalityId;
+    private Long mortalityId;
 
-    @Column(nullable = false)
-    private Date date;
+    // FIX: FK apuntaba a "birt_lot_id" (typo)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bird_lot_id", referencedColumnName = "lot_id", nullable = false)
+    private BirdLotEntity birdLot;
 
-    @Column(name = "numeber_caualties", nullable = false)
-    private int numberCasualties;
+    // FIX: typo "numeber_caualties" corregido en nombre de columna
+    @Column(name = "number_casualties", nullable = false)
+    private Integer numberCasualties;
 
-    @Column(nullable = false)
+    @Column(length = 100)
     private String cause;
 
-    @ManyToOne
-    @JoinColumn(
-            name = "birt_lot_id",
-            referencedColumnName = "lot_id"
-    )
-    private BirdLotEntity birdLot;
+    // FIX: era Date, ahora LocalDate
+    @Column(nullable = false)
+    @Builder.Default
+    private LocalDate date = LocalDate.now();
+
+    // NUEVO: quién registró la baja
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "registered_by", referencedColumnName = "user_id")
+    private UserEntity registeredBy;
+
+    @Column(columnDefinition = "TEXT")
+    private String notes;
 }

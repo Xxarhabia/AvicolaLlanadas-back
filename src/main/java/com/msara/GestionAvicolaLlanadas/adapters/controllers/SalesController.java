@@ -1,8 +1,7 @@
 package com.msara.GestionAvicolaLlanadas.adapters.controllers;
 
-import com.msara.GestionAvicolaLlanadas.adapters.dto.request.SalesRequest;
+import com.msara.GestionAvicolaLlanadas.adapters.dto.request.SaleRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.response.GeneralResponse;
-import com.msara.GestionAvicolaLlanadas.application.services.SalesService;
 import com.msara.GestionAvicolaLlanadas.application.services.impl.SalesServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +23,7 @@ public class SalesController {
     }
 
     @PostMapping
-    public ResponseEntity<GeneralResponse> recordSale(@RequestBody SalesRequest request) {
+    public ResponseEntity<GeneralResponse> recordSale(@RequestBody SaleRequest request) {
         return new ResponseEntity<>(salesService.recordSaleToCustomer(request), HttpStatus.OK);
     }
 }

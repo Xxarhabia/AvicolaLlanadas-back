@@ -10,7 +10,7 @@ description = "Backend para la avicola llanadas"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 

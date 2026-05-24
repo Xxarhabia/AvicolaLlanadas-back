@@ -1,7 +1,5 @@
 package com.msara.GestionAvicolaLlanadas.domain.entities;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,25 +21,27 @@ public class BirdLotEntity {
     @Column(name = "lot_id")
     private Long lotId;
 
-    @Column(nullable = false, name = "date_entry")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateEntry;
-
-    @Column(nullable = true, name = "closing_date")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate closingDate;
-
-    @Column(nullable = false, name = "bird_type", length = 50)
-    @JsonProperty("bird_type")
+    @Column(name = "bird_type", nullable = false, length = 50)
     private String birdType;
 
-    @Column(nullable = false, name = "initial_quanitity")
-    @JsonProperty("initial_quantity")
-    private int initialQuantity;
+    @Column(name = "initial_quantity", nullable = false) // FIX: typo "quanitity" corregido
+    private Integer initialQuantity;
 
-    @Column(nullable = false, name = "current_quantity")
-    @JsonProperty("current_quantity")
-    private int currentQuantity;
+    @Column(name = "current_quantity", nullable = false)
+    private Integer currentQuantity;
 
-    private int status;
+    @Column(name = "date_entry", nullable = false)
+    private LocalDate dateEntry;
+
+    @Column(name = "closing_date")
+    private LocalDate closingDate;
+
+    // FIX: era int (0/1), ahora String con valores controlados por CHECK en BD
+    // ACTIVO | CERRADO | VENDIDO | PERDIDO
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private String status = "ACTIVO";
+
+    @Column(columnDefinition = "TEXT")
+    private String notes;
 }
