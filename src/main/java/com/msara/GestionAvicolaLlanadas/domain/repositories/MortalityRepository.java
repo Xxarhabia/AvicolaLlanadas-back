@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-interface MortalityRepository extends JpaRepository<MortalityEntity, Long> {
+public interface MortalityRepository extends JpaRepository<MortalityEntity, Long> {
 
     List<MortalityEntity> findByBirdLotLotId(Long lotId);
 

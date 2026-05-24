@@ -2,6 +2,7 @@ package com.msara.GestionAvicolaLlanadas.application.services;
 
 import com.msara.GestionAvicolaLlanadas.adapters.dto.request.MortalityRequest;
 import com.msara.GestionAvicolaLlanadas.adapters.dto.response.GeneralResponse;
+import com.msara.GestionAvicolaLlanadas.domain.entities.MortalityEntity;
 
 import java.util.List;
 
@@ -11,5 +12,5 @@ public interface MortalityService {
     GeneralResponse recordMortality(MortalityRequest request);
 
     // Historial de mortalidad de un lote
-    List<MortalityRequest> getMortalityByLot(Long lotId);
+    List<MortalityEntity> getMortalityByLot(Long lotId);
 }
